@@ -2,6 +2,7 @@
 title: "Park Flies Microbiome Analysis"
 output: learnr::tutorial
 runtime: shiny_prerendered
+description: "Comparative Analysis of the Microbiome of PD flies and Control flies"
 ---
 
 ```{r setup, include=FALSE}
@@ -52,6 +53,127 @@ In this tutorial you will see how all figures were created for the Parkinson Fli
 ### Using QIIME2
 
 {bash}
+
+source activate qiime2-2019.7
+
+cd ~/Park-Proj/Evan_stuff/parkFlies/Files/CURA_project
+
+name=call19
+mapper=call_mapper.tsv
+seqsdir=reads/
+
+
+# filter out wolbachia reads
+qiime taxa filter-table \
+  --i-table table-$name"".qza \
+  --i-taxonomy taxonomy-$name"".qza \
+  --p-exclude Wolbachia \
+  --o-filtered-table table-$name""_noW.qza
+  
+# filter out Lactobacillaceae
+qiime feature-table filter-features\
+  --i-table table-$name""_noW.qza \
+  --m-metadata-file OTUs.tsv \
+  --p-exclude-ids \
+  --o-filtered-table table-$name""_feature.qza
+  
+qiime taxa filter-table \
+  --i-table table-$name""_feature.qza \
+  --i-taxonomy taxonomy-$name"".qza \
+  --p-mode exact \
+  --p-exclude "k__Bacteria; p__Firmicutes; c__Bacilli; o__Lactobacillales; f__Lactobacillaceae" \
+  --o-filtered-table table-$name""_feature2.qza  
+  
+  
+qiime taxa filter-table \
+  --i-table table-$name"".qza \
+  --i-taxonomy taxonomy-$name"".qza \
+  --p-exclude Mitochondira,Chloroplast,Archaea,Wolbachia \
+  --o-filtered-table table-$name""_noOther.qza
+
+qiime feature-table summarize \
+--i-table table-$name"".qza \
+--o-visualization table-$name"".qzv \
+--m-sample-metadata-file $mapper
+
+
+## make a tree
+qiime phylogeny align-to-tree-mafft-fasttree \
+  --i-sequences rep-seqs-$name"".qza \
+  --o-alignment aligned-rep-seqs-$name"".qza \
+  --o-masked-alignment masked-aligned-rep-seqs-$name"".qza \
+  --o-tree unrooted-tree-$name"".qza \
+  --o-rooted-tree rooted-tree-$name"".qza
+  
+sdepth=115
+
+bash ../16sscripts/standard_qiime3.sh $name""_noW $name UCLA_controls 164 $mapper "lab = 'UCLA' AND genotype_class = 'control'"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noW $name UCLA_mutants 164 $mapper "lab = 'UCLA' AND genotype_class = 'mutant'"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noW $name Stanford_controls 2974 $mapper "lab = 'Stanford' AND genotype_class = 'control'"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noW $name Stanford_mutants 2974 $mapper "lab = 'Stanford' AND genotype_class = 'mutant'"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noW $name Pallanck_controls 7188 $mapper "lab = 'Pallanck'AND genotype_class = 'control'"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noW $name Pallanck_mutants 7188 $mapper "lab = 'Pallanck'AND genotype_class = 'mutant'"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noW $name Bellen_controls 1565 $mapper "lab = 'Bellen' AND genotype_class = 'control'"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noW $name Bellen_mutants_174 1565 $mapper "lab = 'Bellen' AND genotype = 'iPLA2-VIA[Delta174]'"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noW $name Bellen_mutants_192 1565 $mapper "lab = 'Bellen' AND genotype = 'iPLA2-VIA[Delta192]'"
+
+bash ../16sscripts/standard_qiime3.sh $name"" $name bloomington 1565 $mapper "lab = 'Bloomington'"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noW $name All 200 $mapper "lab IN ('UCLA','Stanford','Bellen','Pallanck')"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noOther $name pinks 164 $mapper "genotype IN ('PG (Control)','pink15')"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noOther $name pinks_noControl 164 $mapper "genotype IN ('pink15')"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noOther $name Bloom_pink 164 $mapper "lab = 'Bloomington' AND genotype = 'pink15'"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noW $name iPLA174_noControl 1565 $mapper "genotype IN ('iPLA2-VIA[Delta174]')"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noW $name iPLA174 1565 $mapper "genotype IN ('iPLA2-VIA Control','iPLA2-VIA[Delta174]')"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noW $name Bloom_174 1565 $mapper "lab = 'Bloomington' AND genotype = 'iPLA2-VIA[Delta174]'"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noW $name iPLA192_noControl 1565 $mapper "genotype IN ('iPLA2-VIA[Delta192]')"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noW $name iPLA192 1565 $mapper "genotype IN ('iPLA2-VIA Control','iPLA2-VIA[Delta192]')"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noW $name Bloom_192 1565 $mapper "lab = 'Bloomington' AND genotype = 'iPLA2-VIA[Delta192]'"
+
+bash ../16sscripts/standard_qiime3.sh $name""_noW $name iPLA 1565 $mapper "genotype IN ('iPLA2-VIA Control', 'iPLA2-VIA[Delta174]', 'iPLA2-VIA[Delta192]')"
+
+
+bash ../16sscripts/standard_qiime3.sh $name""_noW $name bellen_mutants 1565 $mapper "lab = 'Bellen' AND genotype_class = 'mutant'"
+
+
+bash ../16sscripts/standard_qiime3.sh $name""_noOther $name DJ_w1118 1565 $mapper "genotype IN ('DJ-1 _/_','w1118') AND lab = 'Bloomington'"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## Topic 1
