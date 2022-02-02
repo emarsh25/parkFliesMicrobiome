@@ -41,6 +41,18 @@ library(learnr)
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
+## Introduction
+
+### Welcome to the Parkinson Flies Microbiome Analysis Figures
+
+In this tutorial you will see how all figures were created for the Parkinson Flies Microbiome Paper. Feel free to experiment with the tutorial by changing the taxon levels or other similar changes.
+
+## Bash Work
+
+### Using QIIME2
+
+{bash}
+
 
 ## Topic 1
 
