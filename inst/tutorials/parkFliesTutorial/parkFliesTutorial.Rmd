@@ -64,20 +64,21 @@ mapper=call_mapper.tsv
 seqsdir=reads/
 
 
-# filter out wolbachia reads
+*filter out wolbachia reads*
 qiime taxa filter-table \
   --i-table table-$name"".qza \
   --i-taxonomy taxonomy-$name"".qza \
   --p-exclude Wolbachia \
   --o-filtered-table table-$name""_noW.qza
   
-# filter out Lactobacillaceae
+*filter out individual OTUs*
 qiime feature-table filter-features\
   --i-table table-$name""_noW.qza \
   --m-metadata-file OTUs.tsv \
   --p-exclude-ids \
   --o-filtered-table table-$name""_feature.qza
   
+*filter other unwanted contents*
 qiime taxa filter-table \
   --i-table table-$name"".qza \
   --i-taxonomy taxonomy-$name"".qza \
