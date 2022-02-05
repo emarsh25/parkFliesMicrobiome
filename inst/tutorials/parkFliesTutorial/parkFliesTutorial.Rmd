@@ -159,15 +159,45 @@ bash ../16sscripts/standard_qiime3.sh $name""_noW $name Bloom_192 1565 $mapper "
 
 
 
-## Topic 1
+## Figure 1
 
-### Exercise 
+*All sections of this figure were created seperately and then brought together with grid arrange*
 
-*Here's a simple exercise with an empty code chunk provided for entering the answer.*
+### UCLA Control Taxon Chart
 
-Write the R code required to add two plus two:
+```{r ucla_control}
 
-```{r two-plus-two, exercise=TRUE}
+setwd('~/Park-Proj/Evan_stuff/parkFlies/Files/CURA_project/UCLA_controls/')
+file_path <- "UCLA_controls"
+mapper_file <- "call_mapper.tsv"
+
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.04 ### relative percent abundance in chart -> taxa that are at least this abundant overall will show up
+the_two_var = "onevar" ## ignore
+the_id = "X.SampleID" ## ignore
+plot_color = c("black","brown","blue","red")
+plot_order = c("Lactobacillaceae", "Lactobacillus","Acetobacter")
+x_val = "genotype"
+read_depth = 164
+map_path = "-call19" ## name of the taxonomy file; write instructions on how to create a taxonomy file - taxonomy_forR.csv
+legend_position = "none"
+
+ucla_control_taxon <- make_taxon_plots_1var(file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1, taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+
+flies.labs <- c("PG (Control)", "pink15")
+names(flies.labs) <- c("PG (Control)", "pink15")
+ucla_control_taxon <- ucla_control_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 30, color = "black", face = "bold"
+        )
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Order Level Taxon")
+
+plot(ucla_control_taxon)
 
 ```
 
