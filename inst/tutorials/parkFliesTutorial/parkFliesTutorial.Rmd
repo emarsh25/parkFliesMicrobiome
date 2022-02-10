@@ -39,6 +39,13 @@ library(roxygen2)
 library(learnr)
 
 
+source(url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/16sscripts/make_taxon_plots_condense_2var_0.0.2.R"))
+source(url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/16sscripts/g_legend.R"))
+source(url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/16sscripts/pcoa_2var_0.0.2.R"))
+source(url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/16sscripts/make_ancom_plots_0.0.2.R"))
+source(url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/16sscripts/ancom_tests.R"))
+source(url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/16sscripts/ancom_v2.0.R"))
+
 
 knitr::opts_chunk$set(echo = FALSE)
 ```
