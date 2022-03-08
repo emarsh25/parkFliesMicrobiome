@@ -174,8 +174,8 @@ bash ../16sscripts/standard_qiime3.sh $name""_noW $name Bloom_192 1565 $mapper "
 
 ```{r ucla_control}
 
-setwd('~/Park-Proj/Evan_stuff/parkFlies/Files/CURA_project/UCLA_controls/')
 file_path <- "UCLA_controls"
+urlpath <- "~/Park-Proj/Evan_stuff/parkFlies/Files/CURA_project/UCLA_controls/"
 mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/UCLA_controls/call_mapper.tsv")
 
 var1 = "genotype"
