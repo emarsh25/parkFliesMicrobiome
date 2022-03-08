@@ -31,6 +31,7 @@ library(cowplot)
 library(stringr)
 library(exactRankTests)
 library(readr)
+library(broom)
 
 
 library(devtools)
@@ -253,15 +254,15 @@ plot(ucla_mutant_taxon)
 
 file_path <- "UCLA"
 urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/UCLA/"
-mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/UCLA/call_mapper.tsv")
+mapper_file <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/UCLA/call_mapper.tsv"
 
-map_file <- read.table(mapper_file,comment.char = "", header=T, fill=T, sep="\t") %>% mutate(X.SampleID = gsub(pattern = "-",replacement = "-",x = X.SampleID))
+map_file <- read.table(url(mapper_file),comment.char = "", header=T, fill=T, sep="\t") %>% mutate(X.SampleID = gsub(pattern = "-",replacement = "-",x = X.SampleID))
 
-flies_weighted <- read.table(paste('core-metrics-results-',file_path,'/weighted_unifrac_distance_matrix/distance-matrix.tsv',sep=""), header=T, sep="\t")
+flies_weighted <- read.table(url(paste(urlpath,'core-metrics-results-',file_path,'/weighted_unifrac_distance_matrix/distance-matrix.tsv',sep="")), header=T, sep="\t")
 flies_weighted_dm <- as.dist(flies_weighted[,2:dim(flies_weighted)[2]])
 flies_unifrac_table <- flies_weighted %>% dplyr::select(X) %>% left_join(map_file, by=c("X"="X.SampleID")) %>% droplevels()
 
-table <- adonis2(flies_weighted_dm ~ genotype * vial_model * sex, flies_unifrac_table, permutations=1000)
+table <- adonis2(flies_weighted_dm ~ genotype * vial_model, flies_unifrac_table, permutations=1000)
 table <- tidy(round(table,2))
 print(table)
 
@@ -282,7 +283,7 @@ title_name_add <- "weighted Unifrac"
 labs <- c("Control", "Mutant")
 
 
-UCLA_w_PCOA <- pcoa_1var(folder_name=folder_name, mapper_file = mapper_file, var1=var1, var1_colors=var1_colors, title_name_add=title_name_add, legend_position = legend_position)
+UCLA_w_PCOA <- pcoa_1var(urlpath = urlpath, folder_name=folder_name, mapper_file = mapper_file, var1=var1, var1_colors=var1_colors, title_name_add=title_name_add, legend_position = legend_position)
 UCLA_w_PCOA <- UCLA_w_PCOA + scale_color_manual(name="Genotype", labels=labs, values=var1_colors) + 
   scale_fill_manual(name="Genotype", labels=labs, values=var1_colors) +
   ggtitle(paste0("R2=", UCLA_geno_r,", p=", UCLA_geno_p)) +
