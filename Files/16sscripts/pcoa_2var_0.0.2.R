@@ -46,13 +46,13 @@ pcoa_2var <- function(folder_name, mapper_file = mapper_file, var1, var2, source
 		stat_ellipse(aes(x=V2, y=V3,group= get(var1)),            level = .9, show.legend = F, type = "t", geom = "polygon", alpha = 0, inherit.aes=T)
 }
 
-pcoa_1var <- function(folder_name, mapper_file = mapper_file, var1, source_var1, var1_colors, title_name_add, legend_position = "bottom") {
+pcoa_1var <- function(urlpath = urlpath, folder_name, mapper_file = mapper_file, var1, source_var1, var1_colors, title_name_add, legend_position = "bottom") {
 
-  wfpc <- head(read.table(paste('core-metrics-results-',folder_name,'_pcoa_results/ordination.txt',sep=""), sep="\t", fill=T, skip = 9,blank.lines.skip = T, header=F),-2)
-  pc2 <- head(read.table(paste('core-metrics-results-',folder_name,'_pcoa_results/ordination.txt', sep = ""), sep="\t", fill=T, skip = 3, header=F, colClasses = "character"),2)
+  wfpc <- head(read.table(url(paste(urlpath, 'core-metrics-results-',folder_name,'_pcoa_results/ordination.txt',sep="")), sep="\t", fill=T, skip = 9,blank.lines.skip = T, header=F),-2)
+  pc2 <- head(read.table(url(paste(urlpath, 'core-metrics-results-',folder_name,'_pcoa_results/ordination.txt', sep = "")), sep="\t", fill=T, skip = 3, header=F, colClasses = "character"),2)
   pc_values <- as.numeric(as.character(pc2[2,]))*100
   wfpc <- wfpc[,1:15]
-  fut2 <- read.table(paste('core-metrics-results-',folder_name,'_distance_matrix/distance-matrix.tsv',sep=""), header=T, sep="\t", stringsAsFactors = T) %>% dplyr::select(X) %>% mutate(X=as.character(X)) %>% left_join(read.table(paste0(mapper_file),comment.char = "", header=T, sep="\t"), by=c("X"="X.SampleID"))
+  fut2 <- read.table(url(paste(urlpath, 'core-metrics-results-',folder_name,'_distance_matrix/distance-matrix.tsv',sep="")), header=T, sep="\t", stringsAsFactors = T) %>% dplyr::select(X) %>% mutate(X=as.character(X)) %>% left_join(read.table(paste0(mapper_file),comment.char = "", header=T, sep="\t"), by=c("X"="X.SampleID"))
 
   uwmpc_all <- wfpc %>% inner_join(fut2, by=c("V1"="X")) #%>% mutate_(inoculated_with=as.factor(inoculated_with))
 
