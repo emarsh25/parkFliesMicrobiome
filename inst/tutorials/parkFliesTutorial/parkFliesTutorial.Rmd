@@ -637,7 +637,7 @@ read_depth = 1565
 map_path = "-call19"
 legend_position = "none"
 
-bellen_mutant_192_taxon <- make_taxon_plots_1var(file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1,	taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+bellen_mutant_192_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1,	taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
 
 flies.labs <- c("iPLA2-VIA", "iPLA2-VIA[Delta174]", "iPLA2-VIA[Delta192]")
 names(flies.labs) <- c("iPLA2-VIA Control", "iPLA2-VIA[Delta174]", "iPLA2-VIA[Delta192]")
@@ -700,4 +700,109 @@ Bellen_w_PCOA <- Bellen_w_PCOA + scale_color_manual(name="Genotype", labels=labs
   stat_ellipse(aes(x=V2, y=V3,group= get(var1)), lwd = 1, level = .9, show.legend = F, type = "t", geom = "polygon", alpha = 0, inherit.aes=T)
 
 plot(Bellen_w_PCOA)
+```
+
+### Figure Microbe and PCoA Key
+
+```{r figure1_microbe_key, exercise=TRUE}
+
+file_path <- "All"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/All/"
+mapper_file <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/All/call_mapper.tsv"
+
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.015
+the_two_var = "onevar"
+the_id = "X.SampleID"
+plot_color = c("black","yellow", "green", "brown","blue", "red")
+plot_order = c("Pasteurellales", "Enterococcus", "Lactobacillaceae", "Lactobacillus","Acetobacter")
+x_val = "genotype_class"
+read_depth = 2000
+map_path = "-call19"
+legend_position = "bottom"
+
+All_labs <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1,	taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+
+
+flies.labs <- c("Control", "Mutant")
+names(flies.labs) <- c("control", "mutant")
+
+All_labs <- All_labs + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 35, color = "black", face = "bold"
+        ),
+      axis.title=element_text(size=35),
+                   title=element_text(size=40),
+      legend.text = element_text(size = 28),
+      legend.key.size = unit(1, 'cm'),
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Genus", title = "Overall Taxon")
+
+legend_position = "bottom"
+plot_fig1legend <- g_legend(All_labs + theme(legend.title = NULL))
+
+plot_fig1legend + theme(legend.text = element_text(size = 28),
+      legend.key.size = unit(2, 'cm'))
+
+plot(plot_fig1legend)
+
+
+
+
+folder_name = paste0(file_path, "/weighted_unifrac")
+title_name_add <- "weighted Unifrac"
+var1 = "genotype_class"
+var1_colors <-c("blue", "red")
+labs <- c("Control", "Mutant")
+
+All_lab_wPCoA <- pcoa_1var(urlpath = urlpath, folder_name=folder_name, mapper_file = mapper_file, var1=var1, var1_colors=var1_colors, title_name_add=title_name_add, legend_position = legend_position)
+All_lab_wPCoA <- All_lab_wPCoA + 
+  scale_color_manual(name="Genotype", labels=labs, values=var1_colors) + 
+  scale_fill_manual(name="Genotype", labels=labs, values=var1_colors) +
+  theme(text = element_text(size = 35), axis.title = element_text(size = 35), plot.title = element_text(size = 35)) +
+  geom_point(size = 10) +
+  stat_ellipse(aes(x=V2, y=V3,group= get(var1)), lwd = 4, level = .9, show.legend = F, type = "t", geom = "polygon", alpha = 0, inherit.aes=T)
+
+legend_position = "bottom"
+plot_wuwlegend <- g_legend(All_lab_wPCoA)
+plot(plot_wuwlegend)
+
+```
+
+### Label Creation
+
+```{r labels, exercise=TRUE}
+control = textGrob("Control", gp = gpar(fontsize = 45, fontface = "bold"))
+mutant = textGrob("Mutant", gp = gpar(fontsize = 45, fontface = "bold"))
+UCLA = textGrob("UCLA", gp = gpar(fontsize = 45, fontface = "bold"), rot = 90)
+Stanford = textGrob("Stanford", gp = gpar(fontsize = 45, fontface = "bold"), rot = 90)
+Pallanck = textGrob("Pallanck", gp = gpar(fontsize = 45, fontface = "bold"), rot = 90)
+Bellen = textGrob("Bellen", gp = gpar(fontsize = 45, fontface = "bold"), rot = 90)
+var1 = "genotype"
+```
+
+### Figure Creation
+
+```{r figure1, exercise=TRUE}
+figure1 = grid.arrange(
+		ucla_control_taxon, ucla_mutant_taxon, stanford_control_taxon, stanford_mutant_taxon,
+		pallanck_control_taxon, pallanck_mutant_taxon, bellen_control_taxon, bellen_mutant_174_taxon,
+		control, mutant, UCLA, Stanford, Pallanck, Bellen, bellen_mutant_192_taxon,UCLA_w_PCOA + theme(plot.title = element_text(size = 20)), Stanford_w_PCOA + theme(plot.title = element_text(size = 20)),Bellen_w_PCOA + theme(plot.title = element_text(size = 20)),Pallanck_w_PCOA + theme(plot.title = element_text(size = 20)),plot_fig1legend,plot_wuwlegend,
+		widths = c(.25,1.5,1.5,1.5,.2,1.5),	
+   	heights = c(.25,1,1,1,1,.5),
+		layout_matrix=rbind(
+		  c(NA,9,10,10,NA,NA),
+		  c(14,7,8,15,NA,18),
+		  c(13,5,6,NA,NA,19),
+		  c(12,3,4,NA,NA,17),
+			c(11,1,2,NA,NA,16),
+			c(NA,20,20,20,NA,21))
+		)
+
+plot(figure1)
+
 ```
