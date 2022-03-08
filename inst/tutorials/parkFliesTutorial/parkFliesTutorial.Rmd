@@ -208,53 +208,41 @@ plot(ucla_control_taxon)
 
 ```
 
-### Exercise with Code
 
-*Here's an exercise with some prepopulated code as well as `exercise.lines = 5` to provide a bit more initial room to work.*
+### UCLA Mutant Taxon Chart
 
-Now write a function that adds any two numbers and then call it:
+```{r ucla_mutant, exercise=TRUE}
 
-```{r add-function, exercise=TRUE, exercise.lines = 5}
-add <- function() {
-  
-}
-```
+file_path <- "UCLA_mutants"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/UCLA_mutants/"
+mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/UCLA_mutants/call_mapper.tsv")
 
-## Topic 2
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.05 ### relative percent abundance in chart -> taxa that are at least this abundant overall will show up
+the_two_var = "onevar" ## ignore
+the_id = "X.SampleID" ## ignore
+plot_color = c("black","green","brown")
+plot_order = c("Enterococcus", "Lactobacillaceae")
+x_val = "genotype"
+read_depth = 164
+map_path = "-call19" ## name of the taxonomy file; write instructions on how to create a taxonomy file - taxonomy_forR.csv
+legend_position = "none"
 
-### Exercise with Hint
+ucla_mutant_taxon <- make_taxon_plots_1var(file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1, taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
 
-*Here's an exercise where the chunk is pre-evaulated via the `exercise.eval` option (so the user can see the default output we'd like them to customize). We also add a "hint" to the correct solution via the chunk immediate below labeled `print-limit-hint`.*
+flies.labs <- c("PG", "pink15 (UCLA)")
+names(flies.labs) <- c("PG (Control)", "pink15")
+ucla_mutant_taxon <- ucla_mutant_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 30, color = "black", face = "bold"
+        )
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Order Level Taxon")
 
-Modify the following code to limit the number of rows printed to 5:
+plot(ucla_mutant_taxon)
 
-```{r print-limit, exercise=TRUE, exercise.eval=TRUE}
-mtcars
-```
-
-```{r print-limit-hint}
-head(mtcars)
-```
-
-### Quiz
-
-*You can include any number of single or multiple choice questions as a quiz. Use the `question` function to define a question and the `quiz` function for grouping multiple questions together.*
-
-Some questions to verify that you understand the purposes of various base and recommended R packages:
-
-```{r quiz}
-quiz(
-  question("Which package contains functions for installing other R packages?",
-    answer("base"),
-    answer("tools"),
-    answer("utils", correct = TRUE),
-    answer("codetools")
-  ),
-  question("Which of the R packages listed below are used to create plots?",
-    answer("lattice", correct = TRUE),
-    answer("tools"),
-    answer("stats"),
-    answer("grid", correct = TRUE)
-  )
-)
 ```
