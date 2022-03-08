@@ -247,7 +247,7 @@ plot(ucla_mutant_taxon)
 
 ```
 
-### Stanford Controls Taxon Chart
+### Stanford Control Taxon Chart
 
 ```{r stanford_controls, exercise=TRUE}
 
@@ -282,5 +282,236 @@ stanford_control_taxon <- stanford_control_taxon + facet_grid(.~get(var1), drop 
   labs(fill = "Order Level Taxon")
 
 plot(stanford_control_taxon)
+
+```
+
+### Stanford Mutant Taxon Chart
+
+```{r stanford_mutants, exercise=TRUE}
+
+file_path <- "Stanford_mutants"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Stanford_mutants/"
+mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Stanford_mutants/call_mapper.tsv")
+
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.004
+the_two_var = "onevar"
+the_id = "X.SampleID"
+plot_color = c("black", "brown", "blue","red")
+plot_order = c( "Lactobacillaceae", "Lactobacillus", "Acetobacter")
+x_val = "genotype"
+read_depth = 2974
+map_path = "-call19"
+legend_position = "none"
+
+stanford_mutant_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1, taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+
+flies.labs <- c("pink1 B9 FM6", "pink1 RV FM6")
+names(flies.labs) <- c("pink1 B9 FM6 Mutants", "pink1 RV FM6 (Control)")
+stanford_mutant_taxon <- stanford_mutant_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 30, color = "black", face = "bold"
+        )
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Order Level Taxon")
+
+plot(stanford_mutant_taxon)
+
+```
+
+### Pallanck Control Taxon Chart
+
+```{r pallanck_control, exercise=TRUE}
+
+file_path <- "Pallanck_controls"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Pallanck_controls/"
+mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Pallanck_controls/call_mapper.tsv")
+
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.05
+the_two_var = "onevar"
+the_id = "X.SampleID"
+plot_color = c("black","brown","green","red")
+plot_order = c("Lactobacillaceae","Enterococcus", "Acetobacter")
+x_val = "genotype"
+read_depth = 7188
+map_path = "-call19"
+legend_position = "none"
+
+pallanck_control_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1, taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+
+flies.labs <- c("park25", "parkrvA")
+names(flies.labs) <- c("park25", "parkrvA (Control)")
+pallanck_control_taxon <- pallanck_control_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 30, color = "black", face = "bold"
+        )
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Order Level Taxon")
+
+plot(pallanck_control_taxon)
+
+```
+
+### Pallanck Mutant Taxon Chart
+
+```{r pallanck_mutant, exercise=TRUE}
+
+file_path <- "Pallanck_mutants"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Pallanck_mutants/"
+mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Pallanck_mutants/call_mapper.tsv")
+
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.015
+the_two_var = "onevar"
+the_id = "X.SampleID"
+plot_color = c("black","brown","red")
+plot_order = c("Lactobacillaceae", "Acetobacter")
+x_val = "genotype"
+read_depth = 7188
+map_path = "-call19"
+legend_position = "none"
+
+pallanck_mutant_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1, taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+
+flies.labs <- c("park25", "parkrvA")
+names(flies.labs) <- c("park25", "parkrvA (Control)")
+pallanck_mutant_taxon <- pallanck_mutant_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 30, color = "black", face = "bold"
+        )
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Order Level Taxon")
+
+plot(pallanck_mutant_taxon)
+
+```
+
+### Bellen Control Taxon Chart
+
+```{r bellen_control, exercise=TRUE}
+
+file_path <- "Bellen_controls"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Bellen_controls/"
+mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Bellen_controls/call_mapper.tsv")
+
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.015
+the_two_var = "onevar"
+the_id = "X.SampleID"
+plot_color = c("black","yellow","green", "brown","blue","red")
+plot_order = c("Pasteurellales", "Enterococcus" ,"Lactobacillaceae", "Lactobacillus", "Acetobacter")
+x_val = "genotype"
+read_depth = 1565
+map_path = "-call19"
+legend_position = "none"
+
+bellen_control_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1,	taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+
+flies.labs <- c("iPLA2-VIA", "iPLA2-VIA[Delta174]", "iPLA2-VIA[Delta192]")
+names(flies.labs) <- c("iPLA2-VIA Control", "iPLA2-VIA[Delta174]", "iPLA2-VIA[Delta192]")
+
+bellen_control_taxon <- bellen_control_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 30, color = "black", face = "bold"
+        )
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Order Level Taxon")
+
+plot(bellen_control_taxon)
+
+```
+
+### Bellen Mutant (Δ174) Taxon Chart
+
+```{r bellen_mutant_174, exercise=TRUE}
+
+file_path <- "Bellen_mutants_174"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Bellen_mutants_174/"
+mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Bellen_mutants_174/call_mapper.tsv")
+
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.015
+the_two_var = "onevar"
+the_id = "X.SampleID"
+plot_color = c("black","yellow", "brown","blue","red")
+plot_order = c("Pasteurellales","Lactobacillaceae", "Lactobacillus", "Acetobacter")
+x_val = "genotype"
+read_depth = 1565
+map_path = "-call19"
+legend_position = "none"
+
+bellen_mutant_174_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1,	taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+
+flies.labs <- c("iPLA2-VIA", "iPLA2-VIA[Delta174]", "iPLA2-VIA[Delta192]")
+names(flies.labs) <- c("iPLA2-VIA Control", "iPLA2-VIA[Delta174]", "iPLA2-VIA[Delta192]")
+
+bellen_mutant_174_taxon <- bellen_mutant_174_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 30, color = "black", face = "bold"
+        )
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Order Level Taxon")
+
+plot(bellen_mutant_174_taxon)
+
+```
+
+### Bellen Mutant (Δ192) Taxon Chart
+
+```{r bellen_mutant_192, exercise=TRUE}
+
+file_path <- "Bellen_mutants_192"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Bellen_mutants_192/"
+mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Bellen_mutants_192/call_mapper.tsv")
+
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.03
+the_two_var = "onevar"
+the_id = "X.SampleID"
+plot_color = c("black","yellow","green", "brown","blue","red")
+plot_order = c("Pasteurellales", "Enterococcus" ,"Lactobacillaceae", "Lactobacillus", "Acetobacter")
+x_val = "genotype"
+read_depth = 1565
+map_path = "-call19"
+legend_position = "none"
+
+bellen_mutant_192_taxon <- make_taxon_plots_1var(file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1,	taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+
+flies.labs <- c("iPLA2-VIA", "iPLA2-VIA[Delta174]", "iPLA2-VIA[Delta192]")
+names(flies.labs) <- c("iPLA2-VIA Control", "iPLA2-VIA[Delta174]", "iPLA2-VIA[Delta192]")
+
+bellen_mutant_192_taxon <- bellen_mutant_192_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 30, color = "black", face = "bold"
+        )
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Order Level Taxon")
+
+plot(bellen_mutant_192_taxon)
 
 ```
