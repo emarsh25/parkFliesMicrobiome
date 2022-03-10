@@ -923,8 +923,84 @@ plot(bellen_mutant_174_taxon)
 
 ```{r Bloomington_174, exercise=TRUE}
 
+file_path <- "Bloom_174"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Bloom_174/"
+mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Bloom_174/call_mapper.tsv")
 
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.005
+the_two_var = "onevar"
+the_id = "X.SampleID"
+plot_color = c("black","brown","blue","red")
+plot_order = c("Lactobacillaceae", "Lactobacillus", "Acetobacter")
+x_val = "genotype"
+read_depth = 1565
+map_path = "-call19"
+legend_position = "none"
+
+bloom_174_taxon <- make_taxon_plots_1var(urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1,	taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+
+flies.labs <- c("iPLA2-VIA", "iPLA2-VIA[Delta174] (Bloomington)", "iPLA2-VIA[Delta192]")
+names(flies.labs) <- c("iPLA2-VIA Control", "iPLA2-VIA[Delta174]", "iPLA2-VIA[Delta192]")
+
+bloom_174_taxon <- bloom_174_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 30, color = "black", face = "bold"
+        )
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Order Level Taxon")
+
+plot(bloom_174_taxon)
 
 ```
 
+### Δ174 PERMANOVA and PCoA Comparison
 
+```{r Δ174_pcoa, exercise=TRUE}
+
+file_path <- "iPLA174_noControl"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/iPLA174_noControl/"
+mapper_file <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/iPLA174_noControl/call_mapper.tsv"
+
+map_file <- read.table(mapper_file,comment.char = "", header=T, fill=T, sep="\t") %>% mutate(X.SampleID = gsub(pattern = "-",replacement = "-",x = X.SampleID))
+
+flies_weighted <- read.table(url(paste(urlpath,'core-metrics-results-',file_path,'/weighted_unifrac_distance_matrix/distance-matrix.tsv',sep="")), header=T, sep="\t")
+flies_weighted_dm <- as.dist(flies_weighted[,2:dim(flies_weighted)[2]])
+flies_unifrac_table <- flies_weighted %>% dplyr::select(X) %>% left_join(map_file, by=c("X"="X.SampleID")) %>% droplevels()
+
+table <- adonis2(flies_weighted_dm ~ lab * vial_model, flies_unifrac_table, permutations=1000)
+table <- tidy(round(table,2))
+print("PERMANOVA analysis:")
+print(table)
+
+i174_lab_p <- table %>%
+  filter(term == "lab") %>%
+  pull(p.value) %>%
+  round(3)
+i174_lab_r <- table %>%
+  filter(term == "lab") %>%
+  pull(R2) %>%
+  round(3)
+
+var1 = "lab"
+var1_colors <-c("blue","red")
+legend_position = "bottom"
+labs = c("Bellen", "Bloomington")
+folder_name = paste0(file_path, "/weighted_unifrac")
+title_name_add <- "weighted Unifrac"
+
+PCoA_174_noControl <- pcoa_1var(urlpath = urlpath, folder_name=folder_name, mapper_file = mapper_file, var1=var1, var1_colors=var1_colors, title_name_add=title_name_add, legend_position = legend_position)
+PCoA_174_noControl <- PCoA_174_noControl + scale_color_manual(name="Lab", labels=labs, values=var1_colors) + 
+  scale_fill_manual(name="Lab", labels=labs, values=var1_colors) +
+  ggtitle(paste0("R2=", i174_lab_r,", p=", i174_lab_p)) +
+  theme(text = element_text(size = 30), axis.title = element_text(size = 30), plot.title = element_text(size = 30, hjust = 1)) +
+  geom_point(size = 5) +
+  stat_ellipse(aes(x=V2, y=V3,group= get(var1)), lwd = 1, level = .9, show.legend = F, type = "t", geom = "polygon", alpha = 0, inherit.aes=T)
+
+plot(PCoA_174_noControl)
+
+```
