@@ -808,3 +808,71 @@ jpeg(h=1300, w=1800, "Figure_1.jpg", units = "px", quality = 100, pointsize = 1)
 dev.off()
 
 ```
+
+## Table 2
+
+*This is a table showing the PERMANOVA analysis of all mutants versus all controls using the Unweighted Unifrac, Weighted Unifrac, and Bray Curtis Distance Matrices*
+
+### Unweighted Unifrac
+
+```{r all_unweighted, exercise=TRUE}
+
+file_path <- "All"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/All/"
+mapper_file <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/All/call_mapper.tsv"
+
+flies_unweighted <- read.table(url(paste(urlpath,'core-metrics-results-',file_path,'/unweighted_unifrac_distance_matrix/distance-matrix.tsv',sep="")), header=T, sep="\t") %>% mutate(X=as.character(X))
+flies_unweighted_dm <- as.dist(flies_unweighted[,2:dim(flies_unweighted)[2]])
+
+map_file <- read.table(mapper_file,comment.char = "", header=T, fill=T, sep="\t") %>% mutate(X.SampleID = gsub(pattern = "-",replacement = "-",x = X.SampleID))
+flies_unifrac_table <- flies_unweighted %>% select(X) %>% left_join(map_file, by=c("X"="X.SampleID")) %>% droplevels()
+
+table <- adonis2(flies_unweighted_dm ~ lab * genotype_class * vial_model, flies_unifrac_table, permutations=1000)
+table <- tidy(round(table, 2))
+
+print(table)
+
+```
+
+### Weighted Unifrac
+
+```{r all_weighted, exercise=TRUE}
+
+file_path <- "All"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/All/"
+mapper_file <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/All/call_mapper.tsv"
+
+flies_weighted <- read.table(url(paste(urlpath,'core-metrics-results-',file_path,'/weighted_unifrac_distance_matrix/distance-matrix.tsv',sep="")), header=T, sep="\t")
+flies_weighted_dm <- as.dist(flies_weighted[,2:dim(flies_weighted)[2]])
+
+map_file <- read.table(mapper_file,comment.char = "", header=T, fill=T, sep="\t") %>% mutate(X.SampleID = gsub(pattern = "-",replacement = "-",x = X.SampleID))
+flies_unifrac_table <- flies_weighted %>% select(X) %>% left_join(map_file, by=c("X"="X.SampleID")) %>% droplevels()
+
+table <- adonis2(flies_weighted_dm ~ lab * genotype_class * vial_model, flies_unifrac_table, permutations=1000)
+table <- tidy(round(table, 2))
+
+print(table)
+
+```
+
+### Bray Curtis
+
+```{r all_brayCurtis, exercise=TRUE}
+
+file_path <- "All"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/All/"
+mapper_file <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/All/call_mapper.tsv"
+
+flies_bc <- read.table(url(paste(urlpath,'core-metrics-results-',file_path,'/bray_curtis_distance_matrix/distance-matrix.tsv',sep="")), header=T, sep="\t")
+flies_bc_dm <- as.dist(flies_bc[,2:dim(flies_bc)[2]])
+
+map_file <- read.table(mapper_file,comment.char = "", header=T, fill=T, sep="\t") %>% mutate(X.SampleID = gsub(pattern = "-",replacement = "-",x = X.SampleID))
+flies_unifrac_table <- flies_bc %>% select(X) %>% left_join(map_file, by=c("X"="X.SampleID")) %>% droplevels()
+
+table <- adonis2(flies_bc_dm ~ lab * genotype_class * vial_model, flies_unifrac_table, permutations=1000)
+table <- tidy(round(table, 2))
+
+print(table)
+
+```
+
