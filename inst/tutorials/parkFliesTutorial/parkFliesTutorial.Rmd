@@ -1152,3 +1152,19 @@ PCoA_192_noControl <- PCoA_192_noControl + scale_color_manual(name="Lab", labels
 plot(PCoA_192_noControl)
 ```
 
+### Figure Creation
+
+``` {r figure3, exercise=TRUE}
+
+jpeg(h=800, w=1200, "Figure_3.jpg", units = "px", quality = 100, pointsize = 1)
+	grid.arrange(
+		bellen_mutant_192_taxon + labs(tag = "A") + theme(plot.tag = element_text(size = 45)), bloom_192_taxon + labs(tag = "B") + theme(plot.tag = element_text(size = 45)), PCoA_192_noControl + labs(tag = "C") + theme(plot.tag = element_text(size = 45)), perm_192_noControl,
+		widths = c(1.5,1.5),	
+   	heights = c(1, 1),
+		layout_matrix=rbind(
+		  c(1,2),
+		  c(3,4))
+		)
+dev.off()
+
+```
