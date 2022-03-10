@@ -169,375 +169,7 @@ bash ../16sscripts/standard_qiime3.sh $name""_noW $name Bloom_192 1565 $mapper "
 
 ## Figure 1
 
-*All sections of this figure were created separately and then brought together with grid arrange*
-
-### UCLA Control Taxon Chart
-
-```{r ucla_control, exercise=TRUE}
-
-file_path <- "UCLA_controls"
-urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/UCLA_controls/"
-mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/UCLA_controls/call_mapper.tsv")
-
-var1 = "genotype"
-taxonomic_level = "genus"
-rpa_in_chart = 0.04 ### relative percent abundance in chart -> taxa that are at least this abundant overall will show up
-the_two_var = "onevar" ## ignore
-the_id = "X.SampleID" ## ignore
-plot_color = c("black","brown","blue","red")
-plot_order = c("Lactobacillaceae", "Lactobacillus","Acetobacter")
-x_val = "genotype"
-read_depth = 164
-map_path = "-call19" ## name of the taxonomy file; write instructions on how to create a taxonomy file - taxonomy_forR.csv
-legend_position = "none"
-
-ucla_control_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1, taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
-
-flies.labs <- c("PG", "pink15")
-names(flies.labs) <- c("PG (Control)", "pink15")
-ucla_control_taxon <- ucla_control_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
-  theme(
-      strip.text.x = element_text(
-        size = 30, color = "black", face = "bold"
-        )
-      )+ 
-  xlab("Fly Samples") + 
-  ylab("Fractional Abundance") +
-  labs(fill = "Order Level Taxon")
-
-plot(ucla_control_taxon)
-
-```
-
-
-### UCLA Mutant Taxon Chart
-
-```{r ucla_mutant, exercise=TRUE}
-
-file_path <- "UCLA_mutants"
-urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/UCLA_mutants/"
-mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/UCLA_mutants/call_mapper.tsv")
-
-var1 = "genotype"
-taxonomic_level = "genus"
-rpa_in_chart = 0.05 ### relative percent abundance in chart -> taxa that are at least this abundant overall will show up
-the_two_var = "onevar" ## ignore
-the_id = "X.SampleID" ## ignore
-plot_color = c("black","green","brown")
-plot_order = c("Enterococcus", "Lactobacillaceae")
-x_val = "genotype"
-read_depth = 164
-map_path = "-call19" ## name of the taxonomy file; write instructions on how to create a taxonomy file - taxonomy_forR.csv
-legend_position = "none"
-
-ucla_mutant_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1, taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
-
-flies.labs <- c("PG", "pink15")
-names(flies.labs) <- c("PG (Control)", "pink15")
-ucla_mutant_taxon <- ucla_mutant_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
-  theme(
-      strip.text.x = element_text(
-        size = 30, color = "black", face = "bold"
-        )
-      )+ 
-  xlab("Fly Samples") + 
-  ylab("Fractional Abundance") +
-  labs(fill = "Order Level Taxon")
-
-plot(ucla_mutant_taxon)
-
-```
-
-### UCLA PCoA
-
-```{r UCLA_PCoA, exercise=TRUE}
-
-file_path <- "UCLA"
-urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/UCLA/"
-mapper_file <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/UCLA/call_mapper.tsv"
-
-map_file <- read.table(url(mapper_file),comment.char = "", header=T, fill=T, sep="\t") %>% mutate(X.SampleID = gsub(pattern = "-",replacement = "-",x = X.SampleID))
-
-flies_weighted <- read.table(url(paste(urlpath,'core-metrics-results-',file_path,'/weighted_unifrac_distance_matrix/distance-matrix.tsv',sep="")), header=T, sep="\t")
-flies_weighted_dm <- as.dist(flies_weighted[,2:dim(flies_weighted)[2]])
-flies_unifrac_table <- flies_weighted %>% dplyr::select(X) %>% left_join(map_file, by=c("X"="X.SampleID")) %>% droplevels()
-
-table <- adonis2(flies_weighted_dm ~ genotype * vial_model, flies_unifrac_table, permutations=1000)
-table <- tidy(round(table,2))
-print(table)
-
-UCLA_geno_p <- table %>%
-  filter(term == "genotype") %>%
-  pull(p.value) %>%
-  round(3)
-UCLA_geno_r <- table %>%
-  filter(term == "genotype") %>%
-  pull(R2) %>%
-  round(3)
-
-var1 = "genotype_class"
-var1_colors <-c("blue", "red")
-legend_position = "none"
-folder_name = paste0(file_path, "/weighted_unifrac")
-title_name_add <- "weighted Unifrac"
-labs <- c("Control", "Mutant")
-
-
-UCLA_w_PCOA <- pcoa_1var(urlpath = urlpath, folder_name=folder_name, mapper_file = mapper_file, var1=var1, var1_colors=var1_colors, title_name_add=title_name_add, legend_position = legend_position)
-UCLA_w_PCOA <- UCLA_w_PCOA + scale_color_manual(name="Genotype", labels=labs, values=var1_colors) + 
-  scale_fill_manual(name="Genotype", labels=labs, values=var1_colors) +
-  ggtitle(paste0("R2=", UCLA_geno_r,", p=", UCLA_geno_p)) +
-  theme(text = element_text(size = 30), axis.title = element_text(size = 30), plot.title = element_text(size = 30, hjust = 1)) +
-  geom_point(size = 5) +
-  stat_ellipse(aes(x=V2, y=V3,group= get(var1)), lwd = 1, level = .9, show.legend = F, type = "t", geom = "polygon", alpha = 0, inherit.aes=T)
-
-plot(UCLA_w_PCOA)
-```
-
-
-### Stanford Control Taxon Chart
-
-```{r stanford_controls, exercise=TRUE}
-
-file_path <- "Stanford_controls"
-urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Stanford_controls/"
-mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Stanford_controls/call_mapper.tsv")
-
-var1 = "genotype"
-taxonomic_level = "genus"
-rpa_in_chart = 0.002
-the_two_var = "onevar"
-the_id = "X.SampleID"
-plot_color = c("black", "blue","red")
-plot_order = c( "Lactobacillus", "Acetobacter")
-x_val = "genotype"
-read_depth = 2974
-map_path = "-call19"
-legend_position = "none"
-
-stanford_control_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1, taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
-
-flies.labs <- c("pink1 B9 FM6", "pink1 RV FM6")
-names(flies.labs) <- c("pink1 B9 FM6 Mutants", "pink1 RV FM6 (Control)")
-stanford_control_taxon <- stanford_control_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
-  theme(
-      strip.text.x = element_text(
-        size = 30, color = "black", face = "bold"
-        )
-      )+ 
-  xlab("Fly Samples") + 
-  ylab("Fractional Abundance") +
-  labs(fill = "Order Level Taxon")
-
-plot(stanford_control_taxon)
-
-```
-
-### Stanford Mutant Taxon Chart
-
-```{r stanford_mutants, exercise=TRUE}
-
-file_path <- "Stanford_mutants"
-urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Stanford_mutants/"
-mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Stanford_mutants/call_mapper.tsv")
-
-var1 = "genotype"
-taxonomic_level = "genus"
-rpa_in_chart = 0.004
-the_two_var = "onevar"
-the_id = "X.SampleID"
-plot_color = c("black", "brown", "blue","red")
-plot_order = c( "Lactobacillaceae", "Lactobacillus", "Acetobacter")
-x_val = "genotype"
-read_depth = 2974
-map_path = "-call19"
-legend_position = "none"
-
-stanford_mutant_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1, taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
-
-flies.labs <- c("pink1 B9 FM6", "pink1 RV FM6")
-names(flies.labs) <- c("pink1 B9 FM6 Mutants", "pink1 RV FM6 (Control)")
-stanford_mutant_taxon <- stanford_mutant_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
-  theme(
-      strip.text.x = element_text(
-        size = 30, color = "black", face = "bold"
-        )
-      )+ 
-  xlab("Fly Samples") + 
-  ylab("Fractional Abundance") +
-  labs(fill = "Order Level Taxon")
-
-plot(stanford_mutant_taxon)
-
-```
-
-### Stanford PCoA
-
-```{r Stanford_PCoA, exercise=TRUE}
-
-file_path <- "Stanford"
-urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/Stanford/"
-mapper_file <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/Stanford/call_mapper.tsv"
-
-map_file <- read.table(url(mapper_file),comment.char = "", header=T, fill=T, sep="\t") %>% mutate(X.SampleID = gsub(pattern = "-",replacement = "-",x = X.SampleID))
-
-flies_weighted <- read.table(url(paste(urlpath,'core-metrics-results-',file_path,'/weighted_unifrac_distance_matrix/distance-matrix.tsv',sep="")), header=T, sep="\t")
-flies_weighted_dm <- as.dist(flies_weighted[,2:dim(flies_weighted)[2]])
-flies_unifrac_table <- flies_weighted %>% dplyr::select(X) %>% left_join(map_file, by=c("X"="X.SampleID")) %>% droplevels()
-
-table <- adonis2(flies_weighted_dm ~ genotype * vial_model, flies_unifrac_table, permutations=1000)
-table <- tidy(round(table,2))
-print(table)
-
-Stanford_geno_p <- table %>%
-  filter(term == "genotype") %>%
-  pull(p.value) %>%
-  round(3)
-Stanford_geno_r <- table %>%
-  filter(term == "genotype") %>%
-  pull(R2) %>%
-  round(3)
-
-var1 = "genotype_class"
-var1_colors <-c("red","blue")
-legend_position = "none"
-folder_name = paste0(file_path, "/weighted_unifrac")
-title_name_add <- "weighted Unifrac"
-labs <- c("Control", "Mutant")
-
-
-Stanford_w_PCOA <- pcoa_1var(urlpath = urlpath, folder_name=folder_name, mapper_file = mapper_file, var1=var1, var1_colors=var1_colors, title_name_add=title_name_add, legend_position = legend_position)
-Stanford_w_PCOA <- Stanford_w_PCOA + scale_color_manual(name="Genotype", labels=labs, values=var1_colors) + 
-  scale_fill_manual(name="Genotype", labels=labs, values=var1_colors) +
-  ggtitle(paste0("R2=", Stanford_geno_r,", p=", Stanford_geno_p)) +
-  theme(text = element_text(size = 30), axis.title = element_text(size = 30), plot.title = element_text(size = 30, hjust = 1)) +
-  geom_point(size = 5) +
-  stat_ellipse(aes(x=V2, y=V3,group= get(var1)), lwd = 1, level = .9, show.legend = F, type = "t", geom = "polygon", alpha = 0, inherit.aes=T)
-
-plot(Stanford_w_PCOA)
-```
-
-### Pallanck Control Taxon Chart
-
-```{r pallanck_control, exercise=TRUE}
-
-file_path <- "Pallanck_controls"
-urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Pallanck_controls/"
-mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Pallanck_controls/call_mapper.tsv")
-
-var1 = "genotype"
-taxonomic_level = "genus"
-rpa_in_chart = 0.05
-the_two_var = "onevar"
-the_id = "X.SampleID"
-plot_color = c("black","brown","green","red")
-plot_order = c("Lactobacillaceae","Enterococcus", "Acetobacter")
-x_val = "genotype"
-read_depth = 7188
-map_path = "-call19"
-legend_position = "none"
-
-pallanck_control_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1, taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
-
-flies.labs <- c("park25", "parkrvA")
-names(flies.labs) <- c("park25", "parkrvA (Control)")
-pallanck_control_taxon <- pallanck_control_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
-  theme(
-      strip.text.x = element_text(
-        size = 30, color = "black", face = "bold"
-        )
-      )+ 
-  xlab("Fly Samples") + 
-  ylab("Fractional Abundance") +
-  labs(fill = "Order Level Taxon")
-
-plot(pallanck_control_taxon)
-
-```
-
-### Pallanck Mutant Taxon Chart
-
-```{r pallanck_mutant, exercise=TRUE}
-
-file_path <- "Pallanck_mutants"
-urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Pallanck_mutants/"
-mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Pallanck_mutants/call_mapper.tsv")
-
-var1 = "genotype"
-taxonomic_level = "genus"
-rpa_in_chart = 0.015
-the_two_var = "onevar"
-the_id = "X.SampleID"
-plot_color = c("black","brown","red")
-plot_order = c("Lactobacillaceae", "Acetobacter")
-x_val = "genotype"
-read_depth = 7188
-map_path = "-call19"
-legend_position = "none"
-
-pallanck_mutant_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1, taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
-
-flies.labs <- c("park25", "parkrvA")
-names(flies.labs) <- c("park25", "parkrvA (Control)")
-pallanck_mutant_taxon <- pallanck_mutant_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
-  theme(
-      strip.text.x = element_text(
-        size = 30, color = "black", face = "bold"
-        )
-      )+ 
-  xlab("Fly Samples") + 
-  ylab("Fractional Abundance") +
-  labs(fill = "Order Level Taxon")
-
-plot(pallanck_mutant_taxon)
-
-```
-
-### Pallanck PCoA
-
-```{r Pallanck_PCoA, exercise=TRUE}
-
-file_path <- "Pallanck"
-urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/Pallanck/"
-mapper_file <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/Pallanck/call_mapper.tsv"
-
-map_file <- read.table(url(mapper_file),comment.char = "", header=T, fill=T, sep="\t") %>% mutate(X.SampleID = gsub(pattern = "-",replacement = "-",x = X.SampleID))
-
-flies_weighted <- read.table(url(paste(urlpath,'core-metrics-results-',file_path,'/weighted_unifrac_distance_matrix/distance-matrix.tsv',sep="")), header=T, sep="\t")
-flies_weighted_dm <- as.dist(flies_weighted[,2:dim(flies_weighted)[2]])
-flies_unifrac_table <- flies_weighted %>% dplyr::select(X) %>% left_join(map_file, by=c("X"="X.SampleID")) %>% droplevels()
-
-table <- adonis2(flies_weighted_dm ~ genotype * vial_model, flies_unifrac_table, permutations=1000)
-table <- tidy(round(table,2))
-print(table)
-
-Pallanck_geno_p <- table %>%
-  filter(term == "genotype") %>%
-  pull(p.value) %>%
-  round(3)
-Pallanck_geno_r <- table %>%
-  filter(term == "genotype") %>%
-  pull(R2) %>%
-  round(3)
-
-var1 = "genotype_class"
-var1_colors <-c("red","blue")
-legend_position = "none"
-folder_name = paste0(file_path, "/weighted_unifrac")
-title_name_add <- "weighted Unifrac"
-labs <- c("Mutant", "Control")
-
-
-Pallanck_w_PCOA <- pcoa_1var(urlpath = urlpath, folder_name=folder_name, mapper_file = mapper_file, var1=var1, var1_colors=var1_colors, title_name_add=title_name_add, legend_position = legend_position)
-Pallanck_w_PCOA <- Pallanck_w_PCOA + scale_color_manual(name="Genotype", labels=labs, values=var1_colors) + 
-  scale_fill_manual(name="Genotype", labels=labs, values=var1_colors) +
-  ggtitle(paste0("R2=", Pallanck_geno_r,", p=", Pallanck_geno_p)) +
-  theme(text = element_text(size = 30), axis.title = element_text(size = 30), plot.title = element_text(size = 30, hjust = 1)) +
-  geom_point(size = 5) +
-  stat_ellipse(aes(x=V2, y=V3,group= get(var1)), lwd = 1, level = .9, show.legend = F, type = "t", geom = "polygon", alpha = 0, inherit.aes=T)
-
-plot(Pallanck_w_PCOA)
-```
+*All sections of this figure were created separately and then brought together with grid arrange. This figure shows the various mutants in comparison to their controls.*
 
 ### Bellen Control Taxon Chart
 
@@ -702,6 +334,372 @@ Bellen_w_PCOA <- Bellen_w_PCOA + scale_color_manual(name="Genotype", labels=labs
 plot(Bellen_w_PCOA)
 ```
 
+### Pallanck Control Taxon Chart
+
+```{r pallanck_control, exercise=TRUE}
+
+file_path <- "Pallanck_controls"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Pallanck_controls/"
+mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Pallanck_controls/call_mapper.tsv")
+
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.05
+the_two_var = "onevar"
+the_id = "X.SampleID"
+plot_color = c("black","brown","green","red")
+plot_order = c("Lactobacillaceae","Enterococcus", "Acetobacter")
+x_val = "genotype"
+read_depth = 7188
+map_path = "-call19"
+legend_position = "none"
+
+pallanck_control_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1, taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+
+flies.labs <- c("park25", "parkrvA")
+names(flies.labs) <- c("park25", "parkrvA (Control)")
+pallanck_control_taxon <- pallanck_control_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 30, color = "black", face = "bold"
+        )
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Order Level Taxon")
+
+plot(pallanck_control_taxon)
+
+```
+
+### Pallanck Mutant Taxon Chart
+
+```{r pallanck_mutant, exercise=TRUE}
+
+file_path <- "Pallanck_mutants"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Pallanck_mutants/"
+mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Pallanck_mutants/call_mapper.tsv")
+
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.015
+the_two_var = "onevar"
+the_id = "X.SampleID"
+plot_color = c("black","brown","red")
+plot_order = c("Lactobacillaceae", "Acetobacter")
+x_val = "genotype"
+read_depth = 7188
+map_path = "-call19"
+legend_position = "none"
+
+pallanck_mutant_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1, taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+
+flies.labs <- c("park25", "parkrvA")
+names(flies.labs) <- c("park25", "parkrvA (Control)")
+pallanck_mutant_taxon <- pallanck_mutant_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 30, color = "black", face = "bold"
+        )
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Order Level Taxon")
+
+plot(pallanck_mutant_taxon)
+
+```
+
+### Pallanck PCoA
+
+```{r Pallanck_PCoA, exercise=TRUE}
+
+file_path <- "Pallanck"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/Pallanck/"
+mapper_file <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/Pallanck/call_mapper.tsv"
+
+map_file <- read.table(url(mapper_file),comment.char = "", header=T, fill=T, sep="\t") %>% mutate(X.SampleID = gsub(pattern = "-",replacement = "-",x = X.SampleID))
+
+flies_weighted <- read.table(url(paste(urlpath,'core-metrics-results-',file_path,'/weighted_unifrac_distance_matrix/distance-matrix.tsv',sep="")), header=T, sep="\t")
+flies_weighted_dm <- as.dist(flies_weighted[,2:dim(flies_weighted)[2]])
+flies_unifrac_table <- flies_weighted %>% dplyr::select(X) %>% left_join(map_file, by=c("X"="X.SampleID")) %>% droplevels()
+
+table <- adonis2(flies_weighted_dm ~ genotype * vial_model, flies_unifrac_table, permutations=1000)
+table <- tidy(round(table,2))
+print(table)
+
+Pallanck_geno_p <- table %>%
+  filter(term == "genotype") %>%
+  pull(p.value) %>%
+  round(3)
+Pallanck_geno_r <- table %>%
+  filter(term == "genotype") %>%
+  pull(R2) %>%
+  round(3)
+
+var1 = "genotype_class"
+var1_colors <-c("red","blue")
+legend_position = "none"
+folder_name = paste0(file_path, "/weighted_unifrac")
+title_name_add <- "weighted Unifrac"
+labs <- c("Mutant", "Control")
+
+
+Pallanck_w_PCOA <- pcoa_1var(urlpath = urlpath, folder_name=folder_name, mapper_file = mapper_file, var1=var1, var1_colors=var1_colors, title_name_add=title_name_add, legend_position = legend_position)
+Pallanck_w_PCOA <- Pallanck_w_PCOA + scale_color_manual(name="Genotype", labels=labs, values=var1_colors) + 
+  scale_fill_manual(name="Genotype", labels=labs, values=var1_colors) +
+  ggtitle(paste0("R2=", Pallanck_geno_r,", p=", Pallanck_geno_p)) +
+  theme(text = element_text(size = 30), axis.title = element_text(size = 30), plot.title = element_text(size = 30, hjust = 1)) +
+  geom_point(size = 5) +
+  stat_ellipse(aes(x=V2, y=V3,group= get(var1)), lwd = 1, level = .9, show.legend = F, type = "t", geom = "polygon", alpha = 0, inherit.aes=T)
+
+plot(Pallanck_w_PCOA)
+```
+
+### Stanford Control Taxon Chart
+
+```{r stanford_controls, exercise=TRUE}
+
+file_path <- "Stanford_controls"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Stanford_controls/"
+mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Stanford_controls/call_mapper.tsv")
+
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.002
+the_two_var = "onevar"
+the_id = "X.SampleID"
+plot_color = c("black", "blue","red")
+plot_order = c( "Lactobacillus", "Acetobacter")
+x_val = "genotype"
+read_depth = 2974
+map_path = "-call19"
+legend_position = "none"
+
+stanford_control_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1, taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+
+flies.labs <- c("pink1 B9 FM6", "pink1 RV FM6")
+names(flies.labs) <- c("pink1 B9 FM6 Mutants", "pink1 RV FM6 (Control)")
+stanford_control_taxon <- stanford_control_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 30, color = "black", face = "bold"
+        )
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Order Level Taxon")
+
+plot(stanford_control_taxon)
+
+```
+
+### Stanford Mutant Taxon Chart
+
+```{r stanford_mutants, exercise=TRUE}
+
+file_path <- "Stanford_mutants"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Stanford_mutants/"
+mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Stanford_mutants/call_mapper.tsv")
+
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.004
+the_two_var = "onevar"
+the_id = "X.SampleID"
+plot_color = c("black", "brown", "blue","red")
+plot_order = c( "Lactobacillaceae", "Lactobacillus", "Acetobacter")
+x_val = "genotype"
+read_depth = 2974
+map_path = "-call19"
+legend_position = "none"
+
+stanford_mutant_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1, taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+
+flies.labs <- c("pink1 B9 FM6", "pink1 RV FM6")
+names(flies.labs) <- c("pink1 B9 FM6 Mutants", "pink1 RV FM6 (Control)")
+stanford_mutant_taxon <- stanford_mutant_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 30, color = "black", face = "bold"
+        )
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Order Level Taxon")
+
+plot(stanford_mutant_taxon)
+
+```
+
+### Stanford PCoA
+
+```{r Stanford_PCoA, exercise=TRUE}
+
+file_path <- "Stanford"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/Stanford/"
+mapper_file <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/Stanford/call_mapper.tsv"
+
+map_file <- read.table(url(mapper_file),comment.char = "", header=T, fill=T, sep="\t") %>% mutate(X.SampleID = gsub(pattern = "-",replacement = "-",x = X.SampleID))
+
+flies_weighted <- read.table(url(paste(urlpath,'core-metrics-results-',file_path,'/weighted_unifrac_distance_matrix/distance-matrix.tsv',sep="")), header=T, sep="\t")
+flies_weighted_dm <- as.dist(flies_weighted[,2:dim(flies_weighted)[2]])
+flies_unifrac_table <- flies_weighted %>% dplyr::select(X) %>% left_join(map_file, by=c("X"="X.SampleID")) %>% droplevels()
+
+table <- adonis2(flies_weighted_dm ~ genotype * vial_model, flies_unifrac_table, permutations=1000)
+table <- tidy(round(table,2))
+print(table)
+
+Stanford_geno_p <- table %>%
+  filter(term == "genotype") %>%
+  pull(p.value) %>%
+  round(3)
+Stanford_geno_r <- table %>%
+  filter(term == "genotype") %>%
+  pull(R2) %>%
+  round(3)
+
+var1 = "genotype_class"
+var1_colors <-c("red","blue")
+legend_position = "none"
+folder_name = paste0(file_path, "/weighted_unifrac")
+title_name_add <- "weighted Unifrac"
+labs <- c("Control", "Mutant")
+
+
+Stanford_w_PCOA <- pcoa_1var(urlpath = urlpath, folder_name=folder_name, mapper_file = mapper_file, var1=var1, var1_colors=var1_colors, title_name_add=title_name_add, legend_position = legend_position)
+Stanford_w_PCOA <- Stanford_w_PCOA + scale_color_manual(name="Genotype", labels=labs, values=var1_colors) + 
+  scale_fill_manual(name="Genotype", labels=labs, values=var1_colors) +
+  ggtitle(paste0("R2=", Stanford_geno_r,", p=", Stanford_geno_p)) +
+  theme(text = element_text(size = 30), axis.title = element_text(size = 30), plot.title = element_text(size = 30, hjust = 1)) +
+  geom_point(size = 5) +
+  stat_ellipse(aes(x=V2, y=V3,group= get(var1)), lwd = 1, level = .9, show.legend = F, type = "t", geom = "polygon", alpha = 0, inherit.aes=T)
+
+plot(Stanford_w_PCOA)
+```
+
+### UCLA Control Taxon Chart
+
+```{r ucla_control, exercise=TRUE}
+
+file_path <- "UCLA_controls"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/UCLA_controls/"
+mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/UCLA_controls/call_mapper.tsv")
+
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.04 ### relative percent abundance in chart -> taxa that are at least this abundant overall will show up
+the_two_var = "onevar" ## ignore
+the_id = "X.SampleID" ## ignore
+plot_color = c("black","brown","blue","red")
+plot_order = c("Lactobacillaceae", "Lactobacillus","Acetobacter")
+x_val = "genotype"
+read_depth = 164
+map_path = "-call19" ## name of the taxonomy file; write instructions on how to create a taxonomy file - taxonomy_forR.csv
+legend_position = "none"
+
+ucla_control_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1, taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+
+flies.labs <- c("PG", "pink15")
+names(flies.labs) <- c("PG (Control)", "pink15")
+ucla_control_taxon <- ucla_control_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 30, color = "black", face = "bold"
+        )
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Order Level Taxon")
+
+plot(ucla_control_taxon)
+
+```
+
+### UCLA Mutant Taxon Chart
+
+```{r ucla_mutant, exercise=TRUE}
+
+file_path <- "UCLA_mutants"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/UCLA_mutants/"
+mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/UCLA_mutants/call_mapper.tsv")
+
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.05 ### relative percent abundance in chart -> taxa that are at least this abundant overall will show up
+the_two_var = "onevar" ## ignore
+the_id = "X.SampleID" ## ignore
+plot_color = c("black","green","brown")
+plot_order = c("Enterococcus", "Lactobacillaceae")
+x_val = "genotype"
+read_depth = 164
+map_path = "-call19" ## name of the taxonomy file; write instructions on how to create a taxonomy file - taxonomy_forR.csv
+legend_position = "none"
+
+ucla_mutant_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1, taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+
+flies.labs <- c("PG", "pink15")
+names(flies.labs) <- c("PG (Control)", "pink15")
+ucla_mutant_taxon <- ucla_mutant_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 30, color = "black", face = "bold"
+        )
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Order Level Taxon")
+
+plot(ucla_mutant_taxon)
+
+```
+
+### UCLA PCoA
+
+```{r UCLA_PCoA, exercise=TRUE}
+
+file_path <- "UCLA"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/UCLA/"
+mapper_file <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/UCLA/call_mapper.tsv"
+
+map_file <- read.table(url(mapper_file),comment.char = "", header=T, fill=T, sep="\t") %>% mutate(X.SampleID = gsub(pattern = "-",replacement = "-",x = X.SampleID))
+
+flies_weighted <- read.table(url(paste(urlpath,'core-metrics-results-',file_path,'/weighted_unifrac_distance_matrix/distance-matrix.tsv',sep="")), header=T, sep="\t")
+flies_weighted_dm <- as.dist(flies_weighted[,2:dim(flies_weighted)[2]])
+flies_unifrac_table <- flies_weighted %>% dplyr::select(X) %>% left_join(map_file, by=c("X"="X.SampleID")) %>% droplevels()
+
+table <- adonis2(flies_weighted_dm ~ genotype * vial_model, flies_unifrac_table, permutations=1000)
+table <- tidy(round(table,2))
+print(table)
+
+UCLA_geno_p <- table %>%
+  filter(term == "genotype") %>%
+  pull(p.value) %>%
+  round(3)
+UCLA_geno_r <- table %>%
+  filter(term == "genotype") %>%
+  pull(R2) %>%
+  round(3)
+
+var1 = "genotype_class"
+var1_colors <-c("blue", "red")
+legend_position = "none"
+folder_name = paste0(file_path, "/weighted_unifrac")
+title_name_add <- "weighted Unifrac"
+labs <- c("Control", "Mutant")
+
+
+UCLA_w_PCOA <- pcoa_1var(urlpath = urlpath, folder_name=folder_name, mapper_file = mapper_file, var1=var1, var1_colors=var1_colors, title_name_add=title_name_add, legend_position = legend_position)
+UCLA_w_PCOA <- UCLA_w_PCOA + scale_color_manual(name="Genotype", labels=labs, values=var1_colors) + 
+  scale_fill_manual(name="Genotype", labels=labs, values=var1_colors) +
+  ggtitle(paste0("R2=", UCLA_geno_r,", p=", UCLA_geno_p)) +
+  theme(text = element_text(size = 30), axis.title = element_text(size = 30), plot.title = element_text(size = 30, hjust = 1)) +
+  geom_point(size = 5) +
+  stat_ellipse(aes(x=V2, y=V3,group= get(var1)), lwd = 1, level = .9, show.legend = F, type = "t", geom = "polygon", alpha = 0, inherit.aes=T)
+
+plot(UCLA_w_PCOA)
+```
+
 ### Figure Microbe and PCoA Key
 
 ```{r figure1_microbe_key, exercise=TRUE}
@@ -811,7 +809,7 @@ dev.off()
 
 ## Table 1
 
-*This is a table showing the PERMANOVA analysis of all mutants versus all controls using the Unweighted Unifrac, Weighted Unifrac, and Bray Curtis Distance Matrices*
+*This is a table showing the PERMANOVA analysis of all mutants versus all controls using the Unweighted Unifrac, Weighted Unifrac, and Bray Curtis Distance Matrices.*
 
 ### Unweighted Unifrac
 
@@ -878,7 +876,7 @@ print(table)
 
 ## Figure 2
 
-*All sections of this figure were created separately and then brought together with grid arrange*
+*All sections of this figure were created separately and then brought together with grid arrange. This figure shows the pairwise comparison between the Bellen iPLA2-VIA[Delta174] mutants and the Bloomington iPLA2-VIA[Delta174] mutants.*
 
 ### Bellen Δ174 Taxon Chart
 
@@ -1025,7 +1023,7 @@ dev.off()
 
 ## Figure 3
 
-*All sections of this figure were created separately and then brought together with grid arrange*
+*All sections of this figure were created separately and then brought together with grid arrange. This figure shows the pairwise comparison between the Bellen iPLA2-VIA[Delta192] mutants and the Bloomington iPLA2-VIA[Delta192] mutants.*
 
 ### Bellen Δ192 Taxon Chart
 
@@ -1167,4 +1165,239 @@ jpeg(h=800, w=1200, "Figure_3.jpg", units = "px", quality = 100, pointsize = 1)
 		)
 dev.off()
 
+```
+
+## Figure 4
+
+*All sections of this figure were created separately and then brought together with grid arrange. This figure shows the overall and individual lab bacterial richness measures*
+
+### Overall Richness Analysis
+
+```{r all_richness, exercise=TRUE}
+
+file_path <- "All"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/All/"
+mapper_file <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/All/call_mapper.tsv"
+
+map_file <- read.table(mapper_file,comment.char = "", header=T, fill=T, sep="\t") %>% mutate(X.SampleID = gsub(pattern = "-",replacement = "-",x = X.SampleID))
+
+shannon_file <- read.table(url(paste(urlpath,'core-metrics-results-',file_path,'/shannon_richness/alpha-diversity.tsv',sep="")), header=T, sep="\t") %>% mutate(X=as.character(X))
+shannon_table <- shannon_file %>% left_join(map_file, by=c("X"="X.SampleID"))
+
+alpha <- shannon_table %>% group_by(genotype_class) %>% summarise(X, richness = mean(shannon_entropy)) %>% ungroup()
+
+shannon_table <- shannon_table %>% left_join(alpha, "X" = "X")
+shannon_table <- dplyr::select(shannon_table,X, genotype, genotype_class, richness, shannon_entropy)
+wilcox <- wilcox.test(shannon_table$shannon_entropy~shannon_table$genotype_class)
+shannon_table <- shannon_table %>% group_by(genotype_class) %>% summarise(X, genotype, genotype_class, richness, shannon_entropy, SEM = (sd(shannon_entropy) / sqrt(length(shannon_entropy)))) %>% ungroup()
+shannon_table <- dplyr::select(shannon_table, genotype, genotype_class, richness, SEM) %>% unique()
+
+ALL_shannon_plot <- ggplot(shannon_table, aes(x=genotype_class, y=richness)) + 
+             geom_bar(position=position_dodge(), stat="identity") +
+             geom_errorbar(aes(ymin=richness+SEM, ymax=richness-SEM),
+                           width=.2,# Width of the error bars
+                           position=position_dodge(.9)) +
+             coord_cartesian(ylim=c((min(shannon_table$richness-shannon_table$SEM)*.5),max(shannon_table$richness+shannon_table$SEM)*1.15)) + 
+             scale_x_discrete(breaks=c("control", "mutant"), labels=c("Control", "Mutant")) +
+             theme_cowplot() +
+             theme(axis.text=element_text(size=30),
+                   axis.title = element_text(size = 30),
+                   panel.background = element_blank(),
+                   axis.line = element_line(), 
+                   axis.ticks=element_line(),
+                   title=element_text(size=20),
+                   axis.title.x = element_blank(),
+                   legend.position = "none") +
+             labs(y="Richness",x=str_to_title("genotype"),title= paste0("p-value: ", toString(round(wilcox$p.value, 3))), tag = "A")
+
+plot(ALL_shannon_plot)
+
+```
+
+### Bellen Richness Analysis
+
+```{r bellen_richness, exercise=TRUE}
+
+file_path <- "Bellen"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/Bellen/"
+mapper_file <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/Bellen/call_mapper.tsv"
+
+map_file <- read.table(mapper_file,comment.char = "", header=T, fill=T, sep="\t") %>% mutate(X.SampleID = gsub(pattern = "-",replacement = "-",x = X.SampleID))
+
+shannon_file <- read.table(url(paste(urlpath,'core-metrics-results-',file_path,'/shannon_richness/alpha-diversity.tsv',sep="")), header=T, sep="\t") %>% mutate(X=as.character(X))
+shannon_table <- shannon_file %>% left_join(map_file, by=c("X"="X.SampleID"))
+
+alpha <- shannon_table %>% group_by(genotype_class) %>% summarise(X, richness = mean(shannon_entropy)) %>% ungroup()
+
+shannon_table <- shannon_table %>% left_join(alpha, "X" = "X")
+shannon_table <- dplyr::select(shannon_table,X, genotype, genotype_class, richness, shannon_entropy)
+wilcox <- wilcox.test(shannon_table$shannon_entropy~shannon_table$genotype_class)
+shannon_table <- shannon_table %>% group_by(genotype_class) %>% summarise(X, genotype, genotype_class, richness, shannon_entropy, SEM = (sd(shannon_entropy) / sqrt(length(shannon_entropy)))) %>% ungroup()
+shannon_table <- dplyr::select(shannon_table, genotype, genotype_class, richness, SEM) %>% unique()
+
+Bellen_shannon_plot <- ggplot(shannon_table, aes(x=genotype_class, y=richness)) + 
+             geom_bar(position=position_dodge(), stat="identity", width = .5) +
+             geom_errorbar(aes(ymin=richness+SEM, ymax=richness-SEM),
+                           width=.2, # Width of the error bars
+                           position=position_dodge(.9)) +
+             coord_cartesian(ylim=c((min(shannon_table$richness-shannon_table$SEM)*.5),max(shannon_table$richness+shannon_table$SEM)*1.15)) +
+             scale_x_discrete(breaks=c("control", "mutant"), labels=c("Control", "Mutant")) +
+             theme_cowplot() +
+             theme(axis.text=element_text(size=30),
+                   axis.title = element_text(size = 30),
+                   panel.background = element_blank(),
+                   axis.line = element_line(), 
+                   axis.ticks=element_line(),
+                   title=element_text(size=20),
+                   axis.title.x = element_blank(),
+                   legend.position = "none") +
+             labs(y="Richness",x=str_to_title("genotype"),title= paste0("p-value: ", toString(round(wilcox$p.value, 3))), tag = "B")
+
+plot(Bellen_shannon_plot)
+```
+
+### Pallanck Richness Analysis
+
+```{r pallanck_richness, exercise=TRUE}
+
+file_path <- "Pallanck"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/Pallanck/"
+mapper_file <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/Pallanck/call_mapper.tsv"
+
+map_file <- read.table(mapper_file,comment.char = "", header=T, fill=T, sep="\t") %>% mutate(X.SampleID = gsub(pattern = "-",replacement = "-",x = X.SampleID))
+
+shannon_file <- read.table(url(paste(urlpath,'core-metrics-results-',file_path,'/shannon_richness/alpha-diversity.tsv',sep="")), header=T, sep="\t") %>% mutate(X=as.character(X))
+shannon_table <- shannon_file %>% left_join(map_file, by=c("X"="X.SampleID"))
+
+alpha <- shannon_table %>% group_by(genotype) %>% summarise(X, richness = mean(shannon_entropy)) %>% ungroup()
+
+shannon_table <- shannon_table %>% left_join(alpha, "X" = "X")
+shannon_table <- dplyr::select(shannon_table,X, genotype, genotype_class, richness, shannon_entropy)
+wilcox <- wilcox.test(shannon_table$shannon_entropy~shannon_table$genotype_class)
+shannon_table <- shannon_table %>% group_by(genotype) %>% summarise(X, genotype, genotype_class, richness, shannon_entropy, SEM = (sd(shannon_entropy) / sqrt(length(shannon_entropy)))) %>% ungroup()
+shannon_table <- dplyr::select(shannon_table, genotype, genotype_class, richness, SEM) %>% unique()
+
+
+
+Pallanck_shannon_plot <- ggplot(shannon_table, aes(x=factor(genotype, levels = c("parkrvA (Control)", "park25")), y=richness)) + 
+             geom_bar(position=position_dodge(), stat="identity", width = .5) +
+             geom_errorbar(aes(ymin=richness+SEM, ymax=richness-SEM),
+                           width=.2, # Width of the error bars
+                           position=position_dodge(.9)) +
+             coord_cartesian(ylim=c((min(shannon_table$richness-shannon_table$SEM)*.5),max(shannon_table$richness+shannon_table$SEM)*1.15)) +
+             scale_x_discrete(breaks=c("parkrvA (Control)", "park25"), labels=c("Control", "Mutant")) +
+             theme_cowplot() +
+             theme(axis.text=element_text(size=30),
+                   axis.title = element_text(size = 30),
+                   panel.background = element_blank(),
+                   axis.line = element_line(), 
+                   axis.ticks=element_line(),
+                   title=element_text(size=20),
+                   axis.title.x = element_blank(),
+                   legend.position = "none") +
+             labs(y="Richness",x=str_to_title("genotype"),title= paste0("p-value: ", toString(round(wilcox$p.value, 3))), tag = "C")
+
+plot(Pallanck_shannon_plot)
+```
+
+### Stanford Richness Analysis
+
+```{r stanford_richness, exercise=TRUE}
+
+file_path <- "Stanford"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/Stanford/"
+mapper_file <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/Stanford/call_mapper.tsv"
+
+map_file <- read.table(mapper_file,comment.char = "", header=T, fill=T, sep="\t") %>% mutate(X.SampleID = gsub(pattern = "-",replacement = "-",x = X.SampleID))
+
+shannon_file <- read.table(url(paste(urlpath,'core-metrics-results-',file_path,'/shannon_richness/alpha-diversity.tsv',sep="")), header=T, sep="\t") %>% mutate(X=as.character(X))
+shannon_table <- shannon_file %>% left_join(map_file, by=c("X"="X.SampleID"))
+
+alpha <- shannon_table %>% group_by(genotype) %>% summarise(X, richness = mean(shannon_entropy)) %>% ungroup()
+
+shannon_table <- shannon_table %>% left_join(alpha, "X" = "X")
+shannon_table <- dplyr::select(shannon_table,X, genotype, genotype_class, richness, shannon_entropy)
+wilcox <- wilcox.test(shannon_table$shannon_entropy~shannon_table$genotype_class)
+shannon_table <- shannon_table %>% group_by(genotype) %>% summarise(X, genotype, genotype_class, richness, shannon_entropy, SEM = (sd(shannon_entropy) / sqrt(length(shannon_entropy)))) %>% ungroup()
+shannon_table <- dplyr::select(shannon_table, genotype, genotype_class, richness, SEM) %>% unique()
+
+
+
+Stanford_shannon_plot <- ggplot(shannon_table, aes(x=factor(genotype, levels = c("pink1 RV FM6 (Control)", "pink1 B9 FM6 Mutants")), y=richness)) + 
+             geom_bar(position=position_dodge(), stat="identity", width = .5) +
+             geom_errorbar(aes(ymin=richness+SEM, ymax=richness-SEM),
+                           width=.2,# Width of the error bars
+                           position=position_dodge(.9)) +
+             coord_cartesian(ylim=c((min(shannon_table$richness-shannon_table$SEM)*.5),max(shannon_table$richness+shannon_table$SEM)*1.15)) + 
+             scale_x_discrete(breaks=c("pink1 RV FM6 (Control)", "pink1 B9 FM6 Mutants"), labels=c("Control", "Mutant")) +
+             theme_cowplot() +
+             theme(axis.text=element_text(size=30),
+                   axis.title = element_text(size = 30),
+                   panel.background = element_blank(),
+                   axis.line = element_line(), 
+                   axis.ticks=element_line(),
+                   title=element_text(size=20),
+                   axis.title.x = element_blank(),
+                   legend.position = "none") +
+             labs(y="Richness",x=str_to_title("genotype"),title= paste0("p-value: ", toString(round(wilcox$p.value, 3))), tag = "D")
+
+plot(Stanford_shannon_plot)
+```
+
+### UCLA Richness Analysis
+
+```{r ucla_richness, exercise=TRUE}
+
+file_path <- "UCLA"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/UCLA/"
+mapper_file <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/No_Wol/UCLA/call_mapper.tsv"
+
+map_file <- read.table(mapper_file,comment.char = "", header=T, fill=T, sep="\t") %>% mutate(X.SampleID = gsub(pattern = "-",replacement = "-",x = X.SampleID))
+
+shannon_file <- read.table(url(paste(urlpath,'core-metrics-results-',file_path,'/shannon_richness/alpha-diversity.tsv',sep="")), header=T, sep="\t") %>% mutate(X=as.character(X))
+shannon_table <- shannon_file %>% left_join(map_file, by=c("X"="X.SampleID"))
+
+alpha <- shannon_table %>% group_by(genotype) %>% summarise(X, richness = mean(shannon_entropy)) %>% ungroup()
+
+shannon_table <- shannon_table %>% left_join(alpha, "X" = "X")
+shannon_table <- dplyr::select(shannon_table,X, genotype, genotype_class, richness, shannon_entropy)
+wilcox <- wilcox.test(shannon_table$shannon_entropy~shannon_table$genotype_class)
+shannon_table <- shannon_table %>% group_by(genotype) %>% summarise(X, genotype, genotype_class, richness, shannon_entropy, SEM = (sd(shannon_entropy) / sqrt(length(shannon_entropy)))) %>% ungroup()
+shannon_table <- dplyr::select(shannon_table, genotype, genotype_class, richness, SEM) %>% unique()
+
+UCLA_shannon_plot <- ggplot(shannon_table, aes(x=genotype, y=richness)) + 
+             geom_bar(position=position_dodge(), stat="identity", width = .5) +
+             geom_errorbar(aes(ymin=richness+SEM, ymax=richness-SEM),
+                           width=.2,# Width of the error bars
+                           position=position_dodge(.9)) +
+             coord_cartesian(ylim=c((min(shannon_table$richness-shannon_table$SEM)*.5),max(shannon_table$richness+shannon_table$SEM)*1.15)) + 
+             scale_x_discrete(breaks=c("PG (Control)", "pink15"), labels=c("Control", "Mutant")) +
+             theme_cowplot() +
+             theme(axis.text=element_text(size=30),
+                   axis.title = element_text(size=30),
+                   panel.background = element_blank(),
+                   axis.line = element_line(), 
+                   axis.ticks=element_line(),
+                   title=element_text(size=20),
+                   axis.title.x = element_blank(),
+                   legend.position = "none") +
+             labs(y="Richness",x=str_to_title("genotype"),title= paste0("p-value: ", toString(round(wilcox$p.value, 3))), tag = "E")
+
+plot(UCLA_shannon_plot)
+```
+
+### Figure Creation
+
+```{r figure4, exercise=TRUE}
+
+jpeg(h=1200, w=1600, "Figure_4.jpg", units = "px", quality = 100, pointsize = 1)
+	grid.arrange(
+		UCLA_shannon_plot + labs(tag = "E") + theme(plot.tag = element_text(size = 45), title = element_text(size = 30)),Stanford_shannon_plot + labs(tag = "D") + theme(plot.tag = element_text(size = 45), title = element_text(size = 30)),Bellen_shannon_plot + labs(tag = "B") + theme(plot.tag = element_text(size = 45), title = element_text(size = 30)),Pallanck_shannon_plot + labs(tag = "C") + theme(plot.tag = element_text(size = 45), title = element_text(size = 30)), ALL_shannon_plot + labs(tag = "A") + theme(plot.tag = element_text(size = 45), title = element_text(size = 30)),
+		widths = c(1,1,1),	
+   	heights = c(1,1),
+		layout_matrix=rbind(
+		  c(5,3, 4),
+			c(5,2,1))
+		)
+dev.off()
 ```
