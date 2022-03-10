@@ -169,7 +169,7 @@ bash ../16sscripts/standard_qiime3.sh $name""_noW $name Bloom_192 1565 $mapper "
 
 ## Figure 1
 
-*All sections of this figure were created seperately and then brought together with grid arrange*
+*All sections of this figure were created separately and then brought together with grid arrange*
 
 ### UCLA Control Taxon Chart
 
@@ -809,7 +809,7 @@ dev.off()
 
 ```
 
-## Table 2
+## Table 1
 
 *This is a table showing the PERMANOVA analysis of all mutants versus all controls using the Unweighted Unifrac, Weighted Unifrac, and Bray Curtis Distance Matrices*
 
@@ -875,4 +875,56 @@ table <- tidy(round(table, 2))
 print(table)
 
 ```
+
+## Figure 2
+
+*All sections of this figure were created separately and then brought together with grid arrange*
+
+### Bellen Δ174 Taxon Chart
+
+```{r bellen_174, exercise=TRUE}
+
+file_path <- "Bellen_mutants_174"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Bellen_mutants_174/"
+mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Bellen_mutants_174/call_mapper.tsv")
+
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.015
+the_two_var = "onevar"
+the_id = "X.SampleID"
+plot_color = c("black","yellow", "brown","blue","red")
+plot_order = c("Pasteurellales","Lactobacillaceae", "Lactobacillus", "Acetobacter")
+x_val = "genotype"
+read_depth = 1565
+map_path = "-call19"
+legend_position = "none"
+
+bellen_mutant_174_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1,	taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+
+flies.labs <- c("iPLA2-VIA", "iPLA2-VIA[Delta174] (Bellen)", "iPLA2-VIA[Delta192]")
+names(flies.labs) <- c("iPLA2-VIA Control", "iPLA2-VIA[Delta174]", "iPLA2-VIA[Delta192]")
+
+bellen_mutant_174_taxon <- bellen_mutant_174_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 30, color = "black", face = "bold"
+        )
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Order Level Taxon")
+
+plot(bellen_mutant_174_taxon)
+
+```
+
+### Bloomington Δ174 Taxon Chart
+
+```{r Bloomington_174, exercise=TRUE}
+
+
+
+```
+
 
