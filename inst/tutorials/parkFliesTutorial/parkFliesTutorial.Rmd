@@ -973,6 +973,7 @@ flies_weighted_dm <- as.dist(flies_weighted[,2:dim(flies_weighted)[2]])
 flies_unifrac_table <- flies_weighted %>% dplyr::select(X) %>% left_join(map_file, by=c("X"="X.SampleID")) %>% droplevels()
 
 table <- adonis2(flies_weighted_dm ~ lab * vial_model, flies_unifrac_table, permutations=1000)
+perm_174_noControl <- tableGrob(round(table, 2), theme=ttheme_minimal())
 table <- tidy(round(table,2))
 print("PERMANOVA analysis:")
 print(table)
@@ -1004,3 +1005,103 @@ PCoA_174_noControl <- PCoA_174_noControl + scale_color_manual(name="Lab", labels
 plot(PCoA_174_noControl)
 
 ```
+
+### Figure Creation
+
+``` {r figure2, exercise=TRUE}
+
+jpeg(h=800, w=1200, "Figure_2.jpg", units = "px", quality = 100, pointsize = 1)
+	grid.arrange(
+		bellen_mutant_174_taxon + labs(tag = "A") + theme(plot.tag = element_text(size = 45)), bloom_174_taxon + labs(tag = "B") + theme(plot.tag = element_text(size = 45)), PCoA_174_noControl + labs(tag = "C") + theme(plot.tag = element_text(size = 45)), perm_174_noControl ,
+		widths = c(1.5,1.5),	
+   	heights = c(1, 1),
+		layout_matrix=rbind(
+		  c(1,2),
+		  c(3,4))
+		)
+dev.off()
+
+```
+
+## Figure 3
+
+*All sections of this figure were created separately and then brought together with grid arrange*
+
+### Bellen Δ192 Taxon Chart
+
+```{r bellen_192, exercise=TRUE}
+
+file_path <- "Bellen_mutants_192"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Bellen_mutants_192/"
+mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Bellen_mutants_192/call_mapper.tsv")
+
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.03
+the_two_var = "onevar"
+the_id = "X.SampleID"
+plot_color = c("black","yellow","green", "brown","blue","red")
+plot_order = c("Pasteurellales", "Enterococcus" ,"Lactobacillaceae", "Lactobacillus", "Acetobacter")
+x_val = "genotype"
+read_depth = 1565
+map_path = "-call19"
+legend_position = "none"
+
+bellen_mutant_192_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1,	taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+
+flies.labs <- c("iPLA2-VIA", "iPLA2-VIA[Delta174]", "iPLA2-VIA[Delta192] (Bellen)")
+names(flies.labs) <- c("iPLA2-VIA Control", "iPLA2-VIA[Delta174]", "iPLA2-VIA[Delta192]")
+
+bellen_mutant_192_taxon <- bellen_mutant_192_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 30, color = "black", face = "bold"
+        )
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Order Level Taxon")
+
+plot(bellen_mutant_192_taxon)
+
+```
+
+### Bloomington Δ192 Taxon Chart
+
+```{r Bloomington_192, exercise=TRUE}
+
+file_path <- "Bloom_192"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Bloom_192/"
+mapper_file <- url("https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/Bloom_192/call_mapper.tsv")
+
+var1 = "genotype"
+taxonomic_level = "genus"
+rpa_in_chart = 0.01
+the_two_var = "onevar"
+the_id = "X.SampleID"
+plot_color = c("black","black","yellow", "brown","blue","red")
+plot_order = c("Providencia", "Pasteurellales","Lactobacillaceae", "Lactobacillus", "Acetobacter")
+x_val = "genotype"
+read_depth = 1565
+map_path = "-call19"
+legend_position = "none"
+
+bloom_192_taxon <- make_taxon_plots_1var(urlpath = urlpath, file_path = file_path,	map_path = map_path, mapper_file = mapper_file, var1 = var1,	taxonomic_level = taxonomic_level,	rpa_in_chart = rpa_in_chart,	the_two_var = "onevar",	the_id = "X.SampleID",	plot_color = plot_color,	plot_order = plot_order,	x_val = x_val,read_depth = read_depth, legend_position = legend_position)
+
+flies.labs <- c("iPLA2-VIA", "iPLA2-VIA[Delta174]", "iPLA2-VIA[Delta192] (Bloomington)")
+names(flies.labs) <- c("iPLA2-VIA Control", "iPLA2-VIA[Delta174]", "iPLA2-VIA[Delta192]")
+
+bloom_192_taxon <- bloom_192_taxon + facet_grid(.~get(var1), drop = TRUE, space = "free", scales = "free", labeller = labeller(.cols = flies.labs)) +
+  theme(
+      strip.text.x = element_text(
+        size = 30, color = "black", face = "bold"
+        )
+      )+ 
+  xlab("Fly Samples") + 
+  ylab("Fractional Abundance") +
+  labs(fill = "Order Level Taxon")
+
+plot(bloom_192_taxon)
+
+```
+
