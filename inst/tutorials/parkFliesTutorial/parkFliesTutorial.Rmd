@@ -788,7 +788,9 @@ var1 = "genotype"
 ### Figure Creation
 
 ```{r figure1, exercise=TRUE}
-figure1 = grid.arrange(
+
+jpeg(h=1300, w=1800, "Figure_1.jpg", units = "px", quality = 100, pointsize = 1)
+  grid.arrange(
 		ucla_control_taxon, ucla_mutant_taxon, stanford_control_taxon, stanford_mutant_taxon,
 		pallanck_control_taxon, pallanck_mutant_taxon, bellen_control_taxon, bellen_mutant_174_taxon,
 		control, mutant, UCLA, Stanford, Pallanck, Bellen, bellen_mutant_192_taxon,UCLA_w_PCOA + theme(plot.title = element_text(size = 20)), Stanford_w_PCOA + theme(plot.title = element_text(size = 20)),Bellen_w_PCOA + theme(plot.title = element_text(size = 20)),Pallanck_w_PCOA + theme(plot.title = element_text(size = 20)),plot_fig1legend,plot_wuwlegend,
@@ -803,6 +805,6 @@ figure1 = grid.arrange(
 			c(NA,20,20,20,NA,21))
 		)
 
-plot(figure1)
+dev.off()
 
 ```
