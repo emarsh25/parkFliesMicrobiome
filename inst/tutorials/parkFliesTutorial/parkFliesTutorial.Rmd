@@ -960,7 +960,7 @@ plot(bloom_174_taxon)
 
 ### Δ174 PERMANOVA and PCoA Comparison
 
-```{r Δ174_pcoa, exercise=TRUE}
+```{r 174_perm_pcoa, exercise=TRUE}
 
 file_path <- "iPLA174_noControl"
 urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/iPLA174_noControl/"
