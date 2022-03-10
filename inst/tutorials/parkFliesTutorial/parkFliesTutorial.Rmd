@@ -1105,3 +1105,50 @@ plot(bloom_192_taxon)
 
 ```
 
+### Δ192 PERMANOVA and PCoA Comparison
+
+```{r 192_perm_pcoa, exercise=TRUE}
+
+file_path <- "iPLA192_noControl"
+urlpath <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/iPLA192_noControl/"
+mapper_file <- "https://raw.githubusercontent.com/emarsh25/parkFliesMicrobiome/master/Files/Analyses/iPLA192_noControl/call_mapper.tsv"
+
+map_file <- read.table(mapper_file,comment.char = "", header=T, fill=T, sep="\t") %>% mutate(X.SampleID = gsub(pattern = "-",replacement = "-",x = X.SampleID))
+
+flies_weighted <- read.table(url(paste(urlpath,'core-metrics-results-',file_path,'/weighted_unifrac_distance_matrix/distance-matrix.tsv',sep="")), header=T, sep="\t")
+flies_weighted_dm <- as.dist(flies_weighted[,2:dim(flies_weighted)[2]])
+flies_unifrac_table <- flies_weighted %>% dplyr::select(X) %>% left_join(map_file, by=c("X"="X.SampleID")) %>% droplevels()
+
+table <- adonis2(flies_weighted_dm ~ lab * vial_model, flies_unifrac_table, permutations=1000)
+perm_192_noControl <- tableGrob(round(table, 2), theme=ttheme_minimal())
+table <- tidy(round(table,2))
+print("PERMANOVA analysis:")
+print(table)
+
+i192_lab_p <- table %>%
+  filter(term == "lab") %>%
+  pull(p.value) %>%
+  round(3)
+i192_lab_r <- table %>%
+  filter(term == "lab") %>%
+  pull(R2) %>%
+  round(3)
+
+var1 = "lab"
+var1_colors <-c("blue","red")
+legend_position = "bottom"
+labs = c("Bellen", "Bloomington")
+folder_name = paste0(file_path, "/weighted_unifrac")
+title_name_add <- "weighted Unifrac"
+
+PCoA_192_noControl <- pcoa_1var(urlpath = urlpath, folder_name=folder_name, mapper_file = mapper_file, var1=var1, var1_colors=var1_colors, title_name_add=title_name_add, legend_position = legend_position)
+PCoA_192_noControl <- PCoA_192_noControl + scale_color_manual(name="Lab", labels=labs, values=var1_colors) + 
+  scale_fill_manual(name="Lab", labels=labs, values=var1_colors) +
+  ggtitle(paste0("R2=", i192_lab_r,", p=", i192_lab_p)) +
+  theme(text = element_text(size = 30), axis.title = element_text(size = 30), plot.title = element_text(size = 30, hjust = 1)) +
+  geom_point(size = 5) +
+  stat_ellipse(aes(x=V2, y=V3,group= get(var1)), lwd = 1, level = .9, show.legend = F, type = "t", geom = "polygon", alpha = 0, inherit.aes=T)
+
+plot(PCoA_192_noControl)
+```
+
